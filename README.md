@@ -67,4 +67,4 @@ In the method `public static boolean equals(double x, double y, int maxUlps)`, w
     - } else if (offsetLocal > 0) {
 
 #### Analysis
-Both **ACS** and **Nopol** can handle this type of bug. The differences in timeout setting may consequently lead them not to fix this bug.
+Both **ACS** and **Nopol** can easily handle this bug. The differences in timeout setting may consequently lead them not to fix this bug.
