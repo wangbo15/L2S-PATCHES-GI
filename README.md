@@ -18,7 +18,7 @@ Those patches below are semantically equivalent to the developer-provided patche
 1. [Time-19](https://github.com/wangbo15/L2S-PATCHES-GI/tree/master/time_19)
 
 ## Detailed Analysis about the Patches
-Compared with [Nopol](https://github.com/SpoonLabs/nopol) and [ACS](https://github.com/Adobee/ACS), there are four uniquely patches genearted by L2S-E, they are `Math-32`, `Math-33`, `Math-61` and `Time-19`.
+Compared with [Nopol](https://github.com/SpoonLabs/nopol) and [ACS](https://github.com/Adobee/ACS), there are four uniquely patches genearted by L2S-E, they are `Math-32`, `Math-33`, `Math-63` and `Time-19`.
 
 ### Math_32
 #### The Generated Patch
@@ -42,3 +42,29 @@ The patch `tree.getCut() == null` is beyond **ACS**'s search space, and **Nopol*
 
 #### Analysis
 **ACS**' can only make use of the original expression `Precision.compareTo(entry, 0d, maxUlps)`, but it is unable to make the patch. **Nopol** is also unable to handle this. Following the rulls of **L2S-E**, the models first predict `entry ` should be at the first position, then predict the expression `Precision.compareTo($,0d,$) > 0`, at last fill the second positon wish `epsilon`. Because the condtion `Precision.compareTo(entry, 0d, epsilon) < 0` has been occured, `epsilon` has higher probability than the others except `maxUlps`.
+
+### Math_63
+#### The Generated Patch
+    + if(Double.isNaN(x)){return false;}        return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+    - return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+    
+#### The Developer's Patch
+    + return equals(x, y, 1);
+    - return (Double.isNaN(x) && Double.isNaN(y)) || x == y;
+
+#### Analysis
+In the method `public static boolean equals(double x, double y, int maxUlps)`, which is called by developer, it will return false if either `x` or `y` is `NaN`. So the patch of **L2S-E** equals to the developer's patch.
+
+**ACS** can not generate this type of method invocation. The method space of **Nopol** does not contain `isNaN`. 
+
+### Time_19
+#### The Generated Patch
+    + } else if ( offsetLocal >= 0 ) {
+    - } else if (offsetLocal > 0) {
+    
+#### The Developer's Patch
+    + } else if (offsetLocal >= 0) {
+    - } else if (offsetLocal > 0) {
+
+#### Analysis
+Both **ACS** and **Nopol** can handle this type of bug. The differences in timeout setting may consequently lead them not to fix this bug.
